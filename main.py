@@ -11,6 +11,7 @@ from os import system
 from lander import *
 from graphics import *
 from terrain import *
+from autopilot import *
 
 def dampen_rotation(ship, dt):
     if not ship.get_ang_vel() == [0,0,0]:
@@ -32,8 +33,10 @@ def main():
                       100000, 550000, 100000,
                       True, 35, -5)
 
-        landing_zone = terrain([0,0,0], [12500, 15, 5000], 0.0075)
+        landing_zone = terrain([0,0,0], [20000, 15, 4000], 0.0075)
         landing_zone.generate()
+
+        autothrottle = autopilot("AP_autothrottle", ship, False, landing_zone)
 
         # init graphics
         glfw.init()
@@ -42,7 +45,7 @@ def main():
         glfw.set_window_pos(window,200,200)
         glfw.make_context_current(window)
         
-        gluPerspective(90, 800/600, 0.005, 50000.0)
+        gluPerspective(70, 800/600, 0.005, 50000.0)
         glEnable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
         
@@ -50,19 +53,27 @@ def main():
         delta_t = 0.05
         sim_time = 0
 
-        return ship, landing_zone, window, delta_t, sim_time
+        return ship, landing_zone, autothrottle, window, delta_t, sim_time
 
-    ship, landing_zone, window, delta_t, sim_time = init()
+    ship, landing_zone, autothrottle, window, delta_t, sim_time = init()
 
     glRotate(30, 1, 0, 0)
     glTranslate(-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50)
 
+    cycle_num = 0
     while True:
         cycle_start = time.perf_counter()
         sim_time += delta_t
+        cycle_num += 1
         glfw.poll_events()
 
         rot_damp = False
+        autopilot_active = False
+
+        if keyboard.is_pressed("t"):
+            autothrottle.activate()
+        if keyboard.is_pressed("g"):
+            autothrottle.deactivate()
 
         # engine ignition
         if keyboard.is_pressed("r"):
@@ -70,7 +81,11 @@ def main():
 
         # throttle control
         if (keyboard.is_pressed("u") - keyboard.is_pressed("j")):
-            ship.update_thrust((keyboard.is_pressed("u") - keyboard.is_pressed("j")) * ship.get_max_thrust() * delta_t)
+            ship.update_thrust((keyboard.is_pressed("u") - keyboard.is_pressed("j")) * ship.get_max_thrust(), delta_t)
+
+        if cycle_num % 3 == 0 and autothrottle.make_decisions()[1]:
+            ship.update_thrust(autothrottle.make_decisions()[1], delta_t)
+            autopilot_active = True
 
         # attitude control
         
@@ -101,7 +116,7 @@ def main():
             break
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        drawOrigin()
+        #drawOrigin()
         drawTerrain(landing_zone, ship)
         drawVessel(ship)
         
@@ -114,8 +129,9 @@ def main():
             system("clear")
 
         print("T: ", sim_time)
-        print("\nAltitude:", ship.get_landing_tag_pos()[1] - landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]))
+        print("\nAltitude:", ship.get_alt(landing_zone))
         print("Velocity:", vector_mag(ship.get_vel()))
+        print("Descent Rate: ", ship.get_vel()[1])
 
         print("\nMain Engine:", ship.get_main_engine_str())
         print("Throttle:", ship.get_percent_thrust())
@@ -123,6 +139,9 @@ def main():
 
         if rot_damp:
             print("\nKILL ROT")
+
+        if autopilot_active:
+            print("\nATPL ACTV")
 
         cycle_dt = time.perf_counter() - cycle_start
         if cycle_dt < delta_t:

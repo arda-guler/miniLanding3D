@@ -33,6 +33,9 @@ class lander():
     def get_orient(self):
         return self.orient
 
+    def get_thrust(self):
+        return self.thrust
+
     def get_max_thrust(self):
         return self.max_thrust
 
@@ -54,13 +57,20 @@ class lander():
         else:
             return "Shut down"
 
+    def get_mass(self):
+        return self.dry_mass + self.prop_mass
+
     def update_ang_vel(self, rcs, dt):
         self.ang_vel = [self.ang_vel[0] + int(rcs[0]) * dt * self.torque[0],
                         self.ang_vel[1] + int(rcs[1]) * dt * self.torque[1],
                         self.ang_vel[2] + int(rcs[2]) * dt * self.torque[2]]
 
+    def get_accel(self):
+        return self.accel
+
     # we need to clamp thrust values between min and max thrust, obviously
-    def update_thrust(self, d_thrust):
+    def update_thrust(self, d_thrust, dt):
+        d_thrust = max(min(self.max_thrust * 0.15 * dt, d_thrust), -self.max_thrust * 0.15 * dt)
         self.thrust = min(max(self.thrust + d_thrust, self.min_thrust), self.max_thrust)
 
     def set_thrust(self, thrust):
@@ -112,3 +122,9 @@ class lander():
         landing_tag_pos = vector_add(landing_tag_pos, self.pos)
 
         return landing_tag_pos
+
+    def get_alt(self, terrain):
+        return self.get_landing_tag_pos()[1] - terrain.get_height_at_pos([self.get_pos()[0], self.get_pos()[2]])
+
+    def get_alt_quick(self, terrain):
+        return self.get_landing_tag_pos()[1] - terrain.estimate_height_at_pos([self.get_pos()[0], self.get_pos()[2]])

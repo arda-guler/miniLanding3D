@@ -83,3 +83,11 @@ class terrain():
             interpolated_y = y_closest + dist_to_closest * (y_second_closest - y_closest)/total_dist
 
             return interpolated_y
+
+    def estimate_height_at_pos(self, xz):
+        # basically a faster version of getting height, without interpolation
+        if not self.vertices:
+            return -1
+        else:
+            closest_xz = self.get_closest_vertex_xz(xz)
+            return closest_xz[1]
