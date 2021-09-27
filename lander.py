@@ -92,7 +92,8 @@ class lander():
         self.pos = vector_add(self.pos, vel_dt)
 
     def update_mass(self, dt):
-        self.prop_mass -= (self.thrust/self.max_thrust) * self.mass_flow * dt
+        if self.main_engine:
+            self.prop_mass -= (self.thrust/self.max_thrust) * self.mass_flow * dt
 
     def update_physics(self, dt):
         self.update_accel(dt)
