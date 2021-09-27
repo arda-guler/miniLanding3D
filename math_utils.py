@@ -19,6 +19,11 @@ def vector_add(v1, v2):
 def vector_mag(vect):
     return (vect[0]**2 + vect[1]**2 + vect[2]**2)**0.5
 
+def vector_negative(vect):
+    return [-sign(vect[0]) * vect[0],
+            -sign(vect[1]) * vect[1],
+            -sign(vect[2]) * vect[2]]
+
 # rotate an orientation matrix
 def rotate_matrix(orientation_matrix, rotation):
     # orientation matrix is a 3x3 matrix, rotation is a list of three angles in degrees

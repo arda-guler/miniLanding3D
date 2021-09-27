@@ -43,7 +43,7 @@ def drawVessel(v):
     # now get out
     glPopMatrix()
 
-def drawTerrain(t):
+def drawTerrain(t, current_ship):
     glColor(1, 1, 1)
     glPushMatrix()
     glTranslatef(t.get_center()[0], t.get_center()[1], t.get_center()[2])
@@ -53,13 +53,17 @@ def drawTerrain(t):
     # draw x lines
     for a in range(t.z_lines_num):
         for b in range(t.x_lines_num):
-            if not b+1 == t.x_lines_num:
-                glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
-                glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
+            # why the hell is drawing lines so bloody expensive??
+            # anyway, don't draw those that are too far away
+            if (abs(current_ship.get_pos()[0] - t.vertices[a*t.x_lines_num+b][0]) < 500 + current_ship.get_pos()[1] * 2 and
+                abs(current_ship.get_pos()[2] - t.vertices[a*t.x_lines_num+b][2]) < 500 + current_ship.get_pos()[1] * 2):
+                if not b+1 == t.x_lines_num:
+                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
+                    glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
 
-            if not a+1 == t.z_lines_num:
-                glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
-                glVertex3f(t.vertices[(a+1)*t.x_lines_num+b][0], t.vertices[(a+1)*t.x_lines_num+b][1], t.vertices[(a+1)*t.x_lines_num+b][2])
+                if not a+1 == t.z_lines_num:
+                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
+                    glVertex3f(t.vertices[(a+1)*t.x_lines_num+b][0], t.vertices[(a+1)*t.x_lines_num+b][1], t.vertices[(a+1)*t.x_lines_num+b][2])
 
     glEnd()
     glPopMatrix()

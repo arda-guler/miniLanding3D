@@ -24,15 +24,15 @@ def main():
     def init():
         # init objects
         ship = lander(pywavefront.Wavefront("data/models/lunar_lander.obj", collect_faces=True),
-                      [2000, 500, 0], [-100, -20, 0],
+                      [5000, 1000, 0], [-175, -12.5, 0],
                       [[1,0,0], [0,1,0], [0,0,1]],
                       [0,0,0],
                       5000, 3000,
                       [10, 10, 10],
-                      200000, 1000000, 200000,
-                      True, 100, -5)
+                      100000, 550000, 100000,
+                      True, 35, -5)
 
-        landing_zone = terrain([0,-5,0], [5000, 20, 5000], 0.01)
+        landing_zone = terrain([0,0,0], [12500, 15, 5000], 0.0075)
         landing_zone.generate()
 
         # init graphics
@@ -82,19 +82,9 @@ def main():
         # not dampening, manual control
         else:
             attitude_thrust = [0,0,0]
-            
-            if keyboard.is_pressed("w"):
-                attitude_thrust[0] += 1
-            if keyboard.is_pressed("s"):
-                attitude_thrust[0] -= 1
-            if keyboard.is_pressed("a"):
-                attitude_thrust[2] += 1
-            if keyboard.is_pressed("d"):
-                attitude_thrust[2] -= 1
-            if keyboard.is_pressed("q"):
-                attitude_thrust[1] += 1
-            if keyboard.is_pressed("e"):
-                attitude_thrust[1] -= 1
+            attitude_thrust[0] = keyboard.is_pressed("w") - keyboard.is_pressed("s")
+            attitude_thrust[1] = keyboard.is_pressed("q") - keyboard.is_pressed("e")
+            attitude_thrust[2] = keyboard.is_pressed("a") - keyboard.is_pressed("d")
 
             if not attitude_thrust == [0,0,0]:
                 ship.update_ang_vel(attitude_thrust, delta_t)
@@ -112,7 +102,7 @@ def main():
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         drawOrigin()
-        drawTerrain(landing_zone)
+        drawTerrain(landing_zone, ship)
         drawVessel(ship)
         
         glfw.swap_buffers(window)

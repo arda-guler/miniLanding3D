@@ -77,11 +77,14 @@ class lander():
     def update_accel(self, dt):
         self.accel = [0, -lunar_gravity, 0]
 
-        if self.main_engine:
+        if self.main_engine and self.prop_mass:
             thrust_dt = self.thrust * dt
             thrust_dt_vector = vector_scale(self.orient[1], thrust_dt)
             thrust_dt_accel = vector_scale(thrust_dt_vector, 1/(self.dry_mass + self.prop_mass))
             self.accel = vector_add(self.accel, thrust_dt_accel)
+
+        elif not self.prop_mass and self.main_engine:
+            self.toggle_main_engine()
 
     def update_vel(self, dt):
         accel_dt = vector_scale(self.accel, dt)
@@ -92,8 +95,10 @@ class lander():
         self.pos = vector_add(self.pos, vel_dt)
 
     def update_mass(self, dt):
-        if self.main_engine:
+        if self.main_engine and self.prop_mass > 0:
             self.prop_mass -= (self.thrust/self.max_thrust) * self.mass_flow * dt
+        elif self.prop_mass < 0:
+            self.prop_mass = 0
 
     def update_physics(self, dt):
         self.update_accel(dt)
