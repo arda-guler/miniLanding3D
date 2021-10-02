@@ -10,6 +10,9 @@ class autopilot():
     def load_module(self, module):
         return importlib.import_module("data.modules." + module)
 
+    def get_active(self):
+        return self.active
+
     def activate(self):
         self.active = True
 

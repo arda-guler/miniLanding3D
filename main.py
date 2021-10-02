@@ -37,6 +37,7 @@ def main():
         landing_zone.generate()
 
         autothrottle = autopilot("AP_autothrottle", ship, False, landing_zone)
+        autohover = autopilot("AP_hover", ship, False, landing_zone)
 
         # init graphics
         glfw.init()
@@ -53,9 +54,9 @@ def main():
         delta_t = 0.05
         sim_time = 0
 
-        return ship, landing_zone, autothrottle, window, delta_t, sim_time
+        return ship, landing_zone, autothrottle, autohover, window, delta_t, sim_time
 
-    ship, landing_zone, autothrottle, window, delta_t, sim_time = init()
+    ship, landing_zone, autothrottle, autohover, window, delta_t, sim_time = init()
 
     glRotate(30, 1, 0, 0)
     glTranslate(-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50)
@@ -71,9 +72,16 @@ def main():
         autopilot_active = False
 
         if keyboard.is_pressed("t"):
-            autothrottle.activate()
-        if keyboard.is_pressed("g"):
+            autohover.deactivate()
+            autothrottle.activate() 
+        elif keyboard.is_pressed("g"):
             autothrottle.deactivate()
+
+        if keyboard.is_pressed("h"):
+            autothrottle.deactivate()
+            autohover.activate()
+        elif keyboard.is_pressed("n"):
+            autohover.deactivate()
 
         # engine ignition
         if keyboard.is_pressed("r"):
@@ -85,6 +93,9 @@ def main():
 
         if cycle_num % 3 == 0 and autothrottle.make_decisions()[1]:
             ship.update_thrust(autothrottle.make_decisions()[1], delta_t)
+            autopilot_active = True
+        elif cycle_num % 3 == 0 and autohover.make_decisions()[1]:
+            ship.update_thrust(autohover.make_decisions()[1], delta_t)
             autopilot_active = True
 
         # attitude control
