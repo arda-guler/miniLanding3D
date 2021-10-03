@@ -48,7 +48,7 @@ def main():
         
         gluPerspective(70, 800/600, 0.005, 50000.0)
         glEnable(GL_CULL_FACE)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        glPolygonMode(GL_FRONT, GL_FILL)
         
         # init variables
         delta_t = 0.05
