@@ -72,7 +72,12 @@ class terrain():
 
             # hold tight, some terrible interpolation is about to happen!
             closest_index = self.vertices.index(closest_xz)
-            second_closest_xz = self.vertices[closest_index + x_offset + z_offset * self.x_lines_num]
+
+            # for the edge case where we are at the edge of the terrain
+            try:
+                second_closest_xz = self.vertices[closest_index + x_offset + z_offset * self.x_lines_num]
+            except:
+                return closest_xz[1]
 
             y_closest = closest_xz[1]
             y_second_closest = second_closest_xz[1]

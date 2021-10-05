@@ -22,7 +22,7 @@ def drawOrigin():
 def drawVessel(v):
 
     # change color we render with
-    glColor(0.2, 0.2, 1)
+    glColor(0.3, 0.3, 0.35)
     
     # here we go
     glPushMatrix()

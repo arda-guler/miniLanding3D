@@ -25,20 +25,37 @@ def vector_negative(vect):
             -sign(vect[2]) * vect[2]]
 
 # rotate an orientation matrix
-def rotate_matrix(orientation_matrix, rotation):
+def rotate_matrix(orientation_matrix, rotation, base_object=None):
     # orientation matrix is a 3x3 matrix, rotation is a list of three angles in degrees
     orientation_matrix = numpy.array(orientation_matrix)
-        
-    if rotation[0]:
-        rotator = Quaternion(axis=orientation_matrix[0], angle=math.radians(rotation[0]))
-        orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
 
-    if rotation[1]:
-        rotator = Quaternion(axis=orientation_matrix[1], angle=math.radians(rotation[1]))
-        orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
+    if not base_object:
+            
+        if rotation[0]:
+            rotator = Quaternion(axis=orientation_matrix[0], angle=math.radians(rotation[0]))
+            orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
 
-    if rotation[2]:
-        rotator = Quaternion(axis=orientation_matrix[2], angle=math.radians(rotation[2]))
-        orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
+        if rotation[1]:
+            rotator = Quaternion(axis=orientation_matrix[1], angle=math.radians(rotation[1]))
+            orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
+
+        if rotation[2]:
+            rotator = Quaternion(axis=orientation_matrix[2], angle=math.radians(rotation[2]))
+            orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
+
+    else:
+
+        if rotation[0]:
+            rotator = Quaternion(axis=base_object.get_orient()[0], angle=math.radians(rotation[0]))
+            orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
+
+        if rotation[1]:
+            rotator = Quaternion(axis=base_object.get_orient()[1], angle=math.radians(rotation[1]))
+            orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
+
+        if rotation[2]:
+            rotator = Quaternion(axis=base_object.get_orient()[2], angle=math.radians(rotation[2]))
+            orientation_matrix = (numpy.array([rotator.rotate(orientation_matrix[0]), rotator.rotate(orientation_matrix[1]), rotator.rotate(orientation_matrix[2])]))
 
     return orientation_matrix.tolist()
+
