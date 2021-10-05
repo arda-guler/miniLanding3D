@@ -11,6 +11,9 @@ class camera():
     def get_pos(self):
         return self.pos
 
+    def get_orient(self):
+        return self.orient
+
     def set_pos(self, new_pos):
         req_trans = [new_pos[0] - self.pos[0],
                      new_pos[1] - self.pos[1],

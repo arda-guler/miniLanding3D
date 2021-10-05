@@ -51,6 +51,9 @@ class lander():
     def toggle_main_engine(self):
         self.main_engine = not self.main_engine
 
+    def get_main_engine(self):
+        return self.main_engine
+
     def get_main_engine_str(self):
         if self.main_engine:
             return "Running"

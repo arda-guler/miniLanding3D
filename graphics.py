@@ -89,3 +89,61 @@ def drawTerrain(t, current_ship):
     glEnd()
     
     glPopMatrix()
+
+def drawLine2D(x1, y1, x2, y2, color, camera):
+    glPushMatrix()
+    glTranslate(-camera.get_pos()[0],
+                -camera.get_pos()[1],
+                -camera.get_pos()[2])
+    
+    glColor(color[0], color[1], color[2])
+    
+    glBegin(GL_LINES)
+    
+    glVertex3f((x1) * camera.get_orient()[0][0] + (y1) * camera.get_orient()[1][0] + (-10) * camera.get_orient()[2][0],
+               (x1) * camera.get_orient()[0][1] + (y1) * camera.get_orient()[1][1] + (-10) * camera.get_orient()[2][1],
+               (x1) * camera.get_orient()[0][2] + (y1) * camera.get_orient()[1][2] + (-10) * camera.get_orient()[2][2])
+    
+    glVertex3f((x2) * camera.get_orient()[0][0] + (y2) * camera.get_orient()[1][0] + (-10) * camera.get_orient()[2][0],
+               (x2) * camera.get_orient()[0][1] + (y2) * camera.get_orient()[1][1] + (-10) * camera.get_orient()[2][1],
+               (x2) * camera.get_orient()[0][2] + (y2) * camera.get_orient()[1][2] + (-10) * camera.get_orient()[2][2])
+    glEnd()
+    glPopMatrix()
+
+def drawRectangle2D(x1, y1, x2, y2, color, camera):
+    drawLine2D(x1, y1, x2, y1, color, camera)
+    drawLine2D(x1, y1, x1, y2, color, camera)
+    drawLine2D(x2, y1, x2, y2, color, camera)
+    drawLine2D(x1, y2, x2, y2, color, camera)
+
+def drawInterface(camera, percent_thrust, attitude_control, autopilot):
+
+    # artificial horizon
+    glPushMatrix()
+    glTranslate(-camera.get_pos()[0],
+                -camera.get_pos()[1],
+                -camera.get_pos()[2])
+    
+    glColor(0.9, 0.9, 0.9)
+    
+    glBegin(GL_LINES)
+    
+    glVertex3f(-5 * camera.get_orient()[0][0] + 0 * camera.get_orient()[1][0] + (-10) * camera.get_orient()[2][0],
+               0,
+               -5 * camera.get_orient()[0][2] + 0 * camera.get_orient()[1][2] + (-10) * camera.get_orient()[2][2])
+    
+    glVertex3f(5 * camera.get_orient()[0][0] + 0 * camera.get_orient()[1][0] + (-10) * camera.get_orient()[2][0],
+               0,
+               5 * camera.get_orient()[0][2] + 0 * camera.get_orient()[1][2] + (-10) * camera.get_orient()[2][2])
+    glEnd()
+    glPopMatrix()
+    
+    # thrust setting
+    thrust_line_y = percent_thrust/100 * 3 -5
+    
+    drawRectangle2D(5,-2,6,-5,[1,0,1], camera)
+    drawLine2D(5,thrust_line_y,6,thrust_line_y,[0,1,1], camera)
+
+    # AP light
+    if autopilot:
+        drawRectangle2D(5.25, -1, 5.75, 0, [0,0.8,0], camera)

@@ -13,6 +13,8 @@ from graphics import *
 from terrain import *
 from autopilot import *
 from camera import *
+from sound import *
+from math_utils import *
 
 def dampen_rotation(ship, dt):
     if not ship.get_ang_vel() == [0,0,0]:
@@ -60,12 +62,15 @@ def main():
         delta_t = 0.05
         sim_time = 0
 
+        # init sound
+        init_sound()
+
         return ship, landing_zone, autothrottle, autohover, window, main_cam, delta_t, sim_time
 
     ship, landing_zone, autothrottle, autohover, window, main_cam, delta_t, sim_time = init()
 
     main_cam.set_pos([-ship.get_pos()[0]+0.65, -ship.get_pos()[1]-1.995, -ship.get_pos()[2]+1])
-    main_cam.rotate([-40,0,0])
+    main_cam.rotate([-35,0,0])
 
     cycle_num = 0
     while True:
@@ -79,15 +84,19 @@ def main():
 
         if keyboard.is_pressed("t"):
             autohover.deactivate()
-            autothrottle.activate() 
+            autothrottle.activate()
+            play_sfx("AP_on", 0, 2)
         elif keyboard.is_pressed("g"):
             autothrottle.deactivate()
+            play_sfx("AP_off", 0, 2)
 
         if keyboard.is_pressed("h"):
             autothrottle.deactivate()
             autohover.activate()
+            play_sfx("AP_on", 0, 2)
         elif keyboard.is_pressed("n"):
             autohover.deactivate()
+            play_sfx("AP_off", 0, 2)
 
         # engine ignition
         if keyboard.is_pressed("r"):
@@ -120,8 +129,14 @@ def main():
 
             if not attitude_thrust == [0,0,0]:
                 ship.update_ang_vel(attitude_thrust, delta_t)
+                play_sfx("rcs", 0, 1)
 
         ship.update_physics(delta_t)
+
+        if ship.get_main_engine() and not get_channel_busy(0):
+            play_sfx("main_engine", 0, 0)
+
+        set_channel_volume(0, ship.get_percent_thrust()/100)
 
         # have the camera fixed to the ship
         main_cam.move_absolute([-ship.get_vel()[0] * delta_t, -ship.get_vel()[1] * delta_t, -ship.get_vel()[2] * delta_t])
@@ -138,14 +153,21 @@ def main():
         
         # touched down?
         if ship.get_landing_tag_pos()[1] <= landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
-            print("Touchdown!")
-            time.sleep(5)
+            if vector_mag(ship.get_vel()) <= 10:
+                print("Touchdown!")
+                play_sfx("land", 0, 3)
+                time.sleep(5)
+            else:
+                print("Crash!")
+                play_sfx("crash", 0, 3)
+                time.sleep(5)
             break
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()
         drawTerrain(landing_zone, ship)
         drawVessel(ship)
+        drawInterface(main_cam,ship.get_percent_thrust(),attitude_thrust,autopilot_active)
         
         glfw.swap_buffers(window)
 
@@ -155,20 +177,20 @@ def main():
         except:
             system("clear")
 
-        print("T: ", sim_time)
-        print("\nAltitude:", ship.get_alt(landing_zone))
-        print("Velocity:", vector_mag(ship.get_vel()))
-        print("Descent Rate: ", ship.get_vel()[1])
+        print("T: %.1f" % sim_time)
+        print("\nAltitude: %.2f" % ship.get_alt(landing_zone))
+        print("Velocity: %.2f" % vector_mag(ship.get_vel()))
+        print("Descent Rate: %.2f" % ship.get_vel()[1])
 
-        print("\nMain Engine:", ship.get_main_engine_str())
-        print("Throttle:", ship.get_percent_thrust())
-        print("Propellant:", ship.get_prop_mass())
+        #print("\nMain Engine:", ship.get_main_engine_str())
+        #print("Throttle:", ship.get_percent_thrust())
+        print("Propellant: %.0f" % ship.get_prop_mass())
 
         if rot_damp:
             print("\nKILL ROT")
 
-        if autopilot_active:
-            print("\nATPL ACTV")
+        #if autopilot_active:
+            #print("\nATPL ACTV")
 
         cycle_dt = time.perf_counter() - cycle_start
         if cycle_dt < delta_t:
