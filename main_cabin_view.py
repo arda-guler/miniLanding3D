@@ -64,8 +64,8 @@ def main():
 
     ship, landing_zone, autothrottle, autohover, window, main_cam, delta_t, sim_time = init()
 
-    main_cam.set_pos([-ship.get_pos()[0]+0.65, -ship.get_pos()[1]-2, -ship.get_pos()[2]+1.15])
-    main_cam.rotate([-45,0,0])
+    main_cam.set_pos([-ship.get_pos()[0]+0.65, -ship.get_pos()[1]-1.995, -ship.get_pos()[2]+1])
+    main_cam.rotate([-40,0,0])
 
     cycle_num = 0
     while True:
