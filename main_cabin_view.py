@@ -39,6 +39,9 @@ def main():
         landing_zone = terrain([0,0,0], [4000, 15, 20000], 0.0075)
         landing_zone.generate()
 
+        wide_field = terrain([0,-15,0], [100000, 1, 100000], 0.0001)
+        wide_field.generate()
+
         main_cam = camera([0,0,0],
                           [[1,0,0],
                            [0,1,0],
@@ -65,9 +68,9 @@ def main():
         # init sound
         init_sound()
 
-        return ship, landing_zone, autothrottle, autohover, window, main_cam, delta_t, sim_time
+        return ship, landing_zone, wide_field, autothrottle, autohover, window, main_cam, delta_t, sim_time
 
-    ship, landing_zone, autothrottle, autohover, window, main_cam, delta_t, sim_time = init()
+    ship, landing_zone, wide_field, autothrottle, autohover, window, main_cam, delta_t, sim_time = init()
 
     main_cam.set_pos([-ship.get_pos()[0]+0.65, -ship.get_pos()[1]-1.995, -ship.get_pos()[2]+1])
     main_cam.rotate([-35,0,0])
@@ -99,7 +102,8 @@ def main():
             play_sfx("AP_off", 0, 2)
 
         # engine ignition
-        if keyboard.is_pressed("r"):
+        if ((keyboard.is_pressed("r") and not ship.get_main_engine()) or
+            keyboard.is_pressed("f") and ship.get_main_engine()):
             ship.toggle_main_engine()
 
         # throttle control
@@ -134,7 +138,10 @@ def main():
         ship.update_physics(delta_t)
 
         if ship.get_main_engine() and not get_channel_busy(0):
-            play_sfx("main_engine", 0, 0)
+            play_sfx("main_engine", -1, 0)
+
+        elif not ship.get_main_engine() and get_channel_busy(0):
+            stop_channel(0)
 
         set_channel_volume(0, ship.get_percent_thrust()/100)
 
@@ -156,18 +163,25 @@ def main():
             if vector_mag(ship.get_vel()) <= 10:
                 print("Touchdown!")
                 play_sfx("land", 0, 3)
+                if ship.get_main_engine():
+                    ship.toggle_main_engine()
+                    stop_channel(0)
                 time.sleep(5)
             else:
                 print("Crash!")
                 play_sfx("crash", 0, 3)
+                if ship.get_main_engine():
+                    ship.toggle_main_engine()
+                    stop_channel(0)
                 time.sleep(5)
             break
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()
-        drawTerrain(landing_zone, ship)
+        drawTerrain(wide_field, ship, 50)
+        drawTerrain(landing_zone, ship, 2)
         drawVessel(ship)
-        drawInterface(main_cam,ship.get_percent_thrust(),attitude_thrust,autopilot_active)
+        drawInterface(main_cam, ship ,autopilot_active)
         
         glfw.swap_buffers(window)
 

@@ -17,3 +17,7 @@ def get_channel_busy(channel):
 def set_channel_volume(channel, volume):
     channel = mixer.Channel(channel)
     channel.set_volume(volume)
+
+def stop_channel(channel):
+    channel = mixer.Channel(channel)
+    channel.stop()
