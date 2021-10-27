@@ -19,9 +19,9 @@ class autopilot():
     def deactivate(self):
         self.active = False
 
-    def make_decisions(self):
+    def make_decisions(self, custom_params = []):
         if self.active:
-            return self.module.make_decisions(self.vessel, self.terrain)
+            return self.module.make_decisions(self.vessel, self.terrain, custom_params)
         else:
             return (None, None, None)
 

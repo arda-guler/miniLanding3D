@@ -28,7 +28,7 @@ def main():
     def init():
         # init objects
         ship = lander(pywavefront.Wavefront("data/models/LM_tessellated.obj", collect_faces=True),
-                      [0, 1000, 10000], [0, -12.5, -175],
+                      [10, 1000, 10000], [0, -12.5, -175],
                       [[1,0,0], [0,1,0], [0,0,1]],
                       [0,0,0],
                       5000, 3000,
@@ -39,7 +39,7 @@ def main():
         landing_zone = terrain([0,0,0], [4000, 15, 20000], 0.0075)
         landing_zone.generate()
 
-        wide_field = terrain([0,-15,0], [100000, 1, 100000], 0.0001)
+        wide_field = terrain([0,-15,0], [100000, 1, 100000], 0.00005)
         wide_field.generate()
 
         main_cam = camera([0,0,0],
@@ -48,7 +48,7 @@ def main():
                            [0,0,1]])
 
         autothrottle = autopilot("AP_autothrottle", ship, False, landing_zone)
-        autohover = autopilot("AP_hover", ship, False, landing_zone)
+        at_descent_rate = -5
 
         # init graphics
         glfw.init()
@@ -62,15 +62,15 @@ def main():
         glPolygonMode(GL_FRONT, GL_FILL)
         
         # init variables
-        delta_t = 0.05
+        delta_t = 0.1
         sim_time = 0
 
         # init sound
         init_sound()
 
-        return ship, landing_zone, wide_field, autothrottle, autohover, window, main_cam, delta_t, sim_time
+        return ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time
 
-    ship, landing_zone, wide_field, autothrottle, autohover, window, main_cam, delta_t, sim_time = init()
+    ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time = init()
 
     main_cam.set_pos([-ship.get_pos()[0]+0.65, -ship.get_pos()[1]-1.995, -ship.get_pos()[2]+1])
     main_cam.rotate([-35,0,0])
@@ -86,20 +86,16 @@ def main():
         autopilot_active = False
 
         if keyboard.is_pressed("t"):
-            autohover.deactivate()
             autothrottle.activate()
             play_sfx("AP_on", 0, 2)
         elif keyboard.is_pressed("g"):
             autothrottle.deactivate()
             play_sfx("AP_off", 0, 2)
 
-        if keyboard.is_pressed("h"):
-            autothrottle.deactivate()
-            autohover.activate()
-            play_sfx("AP_on", 0, 2)
-        elif keyboard.is_pressed("n"):
-            autohover.deactivate()
-            play_sfx("AP_off", 0, 2)
+        if keyboard.is_pressed("y"):
+            at_descent_rate += 0.5
+        elif keyboard.is_pressed("h"):
+            at_descent_rate -= 0.5
 
         # engine ignition
         if ((keyboard.is_pressed("r") and not ship.get_main_engine()) or
@@ -110,11 +106,8 @@ def main():
         if (keyboard.is_pressed("u") - keyboard.is_pressed("j")):
             ship.update_thrust((keyboard.is_pressed("u") - keyboard.is_pressed("j")) * ship.get_max_thrust(), delta_t)
 
-        if cycle_num % 3 == 0 and autothrottle.make_decisions()[1]:
-            ship.update_thrust(autothrottle.make_decisions()[1], delta_t)
-            autopilot_active = True
-        elif cycle_num % 3 == 0 and autohover.make_decisions()[1]:
-            ship.update_thrust(autohover.make_decisions()[1], delta_t)
+        if cycle_num % 2 == 0 and autothrottle.make_decisions([at_descent_rate])[1]:
+            ship.update_thrust(autothrottle.make_decisions([at_descent_rate])[1], delta_t)
             autopilot_active = True
 
         # attitude control
@@ -181,24 +174,26 @@ def main():
         drawTerrain(wide_field, ship, 50)
         drawTerrain(landing_zone, ship, 2)
         drawVessel(ship)
-        drawInterface(main_cam, ship ,autopilot_active)
+        drawInterface(main_cam, ship, autopilot_active)
         
         glfw.swap_buffers(window)
 
-        # console output
-        try:
-            system("cls")
-        except:
-            system("clear")
+        if cycle_num % 2 == 0:
+            # console output
+            try:
+                system("cls")
+            except:
+                system("clear")
 
-        print("T: %.1f" % sim_time)
-        print("\nAltitude: %.2f" % ship.get_alt(landing_zone))
-        print("Velocity: %.2f" % vector_mag(ship.get_vel()))
-        print("Descent Rate: %.2f" % ship.get_vel()[1])
+            print("T: %.1f" % sim_time)
+            print("\nAltitude: %.2f" % ship.get_alt(landing_zone))
+            print("Velocity: %.2f" % vector_mag(ship.get_vel()))
+            print("Descent Rate: %.2f" % ship.get_vel()[1])
+            print("AP Descent Rate Cmd: %.1f" % at_descent_rate)
 
-        #print("\nMain Engine:", ship.get_main_engine_str())
-        #print("Throttle:", ship.get_percent_thrust())
-        print("Propellant: %.0f" % ship.get_prop_mass())
+            #print("\nMain Engine:", ship.get_main_engine_str())
+            #print("Throttle:", ship.get_percent_thrust())
+            print("Propellant: %.0f" % ship.get_prop_mass())
 
         if rot_damp:
             print("\nKILL ROT")
