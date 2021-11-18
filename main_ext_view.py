@@ -13,6 +13,7 @@ from graphics import *
 from terrain import *
 from autopilot import *
 from sound import *
+from camera import *
 
 def dampen_rotation(ship, dt):
     if not ship.get_ang_vel() == [0,0,0]:
@@ -40,6 +41,11 @@ def main():
         autothrottle = autopilot("AP_autothrottle", ship, False, landing_zone)
         at_descent_rate = -5
 
+        main_cam = camera([0,0,0],
+                          [[1,0,0],
+                           [0,1,0],
+                           [0,0,1]])
+
         # init graphics
         glfw.init()
 
@@ -58,12 +64,14 @@ def main():
         # init sound
         init_sound()
 
-        return ship, landing_zone, autothrottle, at_descent_rate, window, delta_t, sim_time
+        return ship, landing_zone, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time
 
-    ship, landing_zone, autothrottle, at_descent_rate, window, delta_t, sim_time = init()
+    ship, landing_zone, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time = init()
 
-    glRotate(30, 1, 0, 0)
-    glTranslate(-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50)
+    main_cam.set_pos([-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50])
+    main_cam.rotate([-30, 0, 0])
+    #glRotate(30, 1, 0, 0)
+    #glTranslate(-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50)
 
     cycle_num = 0
     while True:
@@ -121,7 +129,8 @@ def main():
         ship.update_physics(delta_t)
 
         # have the camera follow the ship
-        glTranslate(-ship.get_vel()[0] * delta_t, -ship.get_vel()[1] * delta_t, -ship.get_vel()[2] * delta_t)
+        main_cam.move_absolute([-ship.get_vel()[0] * delta_t, -ship.get_vel()[1] * delta_t, -ship.get_vel()[2] * delta_t])
+        #glTranslate(-ship.get_vel()[0] * delta_t, -ship.get_vel()[1] * delta_t, -ship.get_vel()[2] * delta_t)
 
         # touched down?
         if ship.get_landing_tag_pos()[1] <= landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
@@ -152,6 +161,7 @@ def main():
         #drawOrigin()
         drawTerrain(landing_zone, ship, 2)
         drawVessel(ship)
+        drawInterface(main_cam, ship, autopilot_active)
         
         glfw.swap_buffers(window)
 
@@ -161,15 +171,15 @@ def main():
         except:
             system("clear")
 
-        print("T: ", sim_time)
-        print("\nAltitude:", ship.get_alt(landing_zone))
-        print("Velocity:", vector_mag(ship.get_vel()))
-        print("Descent Rate: ", ship.get_vel()[1])
+        print("T: %.2f" % sim_time)
+        print("\nAltitude: %.1f" % ship.get_alt(landing_zone))
+        print("Velocity: %.2f" % vector_mag(ship.get_vel()))
+        print("Descent Rate: %.2f" % ship.get_vel()[1])
         print("AP Descent Rate Cmd: %.1f" % at_descent_rate)
 
         print("\nMain Engine:", ship.get_main_engine_str())
-        print("Throttle:", ship.get_percent_thrust())
-        print("Propellant:", ship.get_prop_mass())
+        print("Throttle: %.2f" % ship.get_percent_thrust())
+        print("Propellant: %.2f" % ship.get_prop_mass())
 
         if rot_damp:
             print("\nKILL ROT")
