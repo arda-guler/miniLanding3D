@@ -15,6 +15,7 @@ from autopilot import *
 from camera import *
 from sound import *
 from math_utils import *
+from gpws import *
 
 def dampen_rotation(ship, dt):
     if not ship.get_ang_vel() == [0,0,0]:
@@ -26,17 +27,18 @@ def dampen_rotation(ship, dt):
 def main():
     
     def init():
+        print("Initializing lander...")
         # init objects
         ship = lander(pywavefront.Wavefront("data/models/LM_tessellated.obj", collect_faces=True),
                       [10, 1000, 10000], [0, -12.5, -175],
                       [[1,0,0], [0,1,0], [0,0,1]],
                       [0,0,0],
-                      5000, 3000,
+                      5000, 4000,
                       [10, 10, 10],
-                      100000, 550000, 100000,
+                      10000, 250000, 45000,
                       True, 35, -3)
 
-        landing_zone = terrain([0,0,0], [4000, 15, 20000], 0.0075)
+        landing_zone = terrain([0,0,0], [4000, 550, 20000], 0.0075)
         landing_zone.generate()
 
         wide_field = terrain([0,-15,0], [100000, 1, 100000], 0.00005)
@@ -47,9 +49,11 @@ def main():
                            [0,1,0],
                            [0,0,1]])
 
+        print("Initializing autopilot...")
         autothrottle = autopilot("AP_autothrottle", ship, False, landing_zone)
         at_descent_rate = -5
 
+        print("Initializing graphics...")
         # init graphics
         glfw.init()
 
@@ -65,6 +69,7 @@ def main():
         delta_t = 0.1
         sim_time = 0
 
+        print("Initializing sound...")
         # init sound
         init_sound()
 
@@ -153,7 +158,7 @@ def main():
         
         # touched down?
         if ship.get_landing_tag_pos()[1] <= landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
-            if vector_mag(ship.get_vel()) <= 10:
+            if vector_mag(ship.get_vel()) <= 10 and ship.get_vel()[1] > -3:
                 print("Touchdown!")
                 play_sfx("land", 0, 3)
                 if ship.get_main_engine():
@@ -168,6 +173,8 @@ def main():
                     stop_channel(0)
                 time.sleep(5)
             break
+
+        gpws(ship, landing_zone, delta_t)
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()

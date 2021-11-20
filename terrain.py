@@ -1,4 +1,5 @@
 import random
+import time
 
 from math_utils import *
 
@@ -10,6 +11,11 @@ class terrain():
         self.vertices = []
 
     def generate(self):
+        def clamp(val, mnm, mxm):
+            return min(max(val, mnm),mxm)
+
+        print("Generating terrain...")
+        
         # divide area into horizontal slits
         x_lines_num = int(self.size[0] * self.detail_level)
         x_lines = []
@@ -27,16 +33,40 @@ class terrain():
             z_lines.append(z_pos_iterator)
             z_pos_iterator += self.size[2]/z_lines_num
 
-        # create terrain vertices, x and z have set places, y (height) is random
-        for a in range(len(z_lines)):
-            for b in range(len(x_lines)):
-                current_vertex = [x_lines[b],
-                                  self.center[1] + random.uniform(-self.size[1], self.size[1]),
-                                  z_lines[a]]
-                self.vertices.append(current_vertex)
+        for z in range(z_lines_num):
+            for x in range(x_lines_num):
+                # x + z*size[0]
+                if x == 0:
+                    last_y = self.center[1]
+
+                if x+z == 0:
+                    current_y = self.center[1] + random.uniform(-25, 25)
+                    
+                current_y = last_y + random.uniform(-25, 25)
+
+                if z > 0:
+                    while abs(current_y - self.vertices[x + (z-1)*x_lines_num][1]) > 25:
+                        current_y = last_y + random.uniform(-25, 25)
+                
+                current_y = clamp(current_y, self.center[1] - self.size[1], self.center[1] + self.size[1])
+                self.vertices.append([x_lines[x], current_y, z_lines[z]])
 
         self.x_lines_num = x_lines_num
         self.z_lines_num = z_lines_num
+
+        print("Generating craters...")
+        # crater generation
+        num_of_craters = int(((self.size[0] * self.size[2])**0.5) / 300)
+
+        for c in range(num_of_craters):
+            cx = random.choice(x_lines)
+            cz = random.choice(z_lines)
+            c_width = random.uniform(150, 600)
+            c_height = random.uniform(100, 250)
+
+            for vertex in self.vertices:
+                if (vertex[0] - cx)**2 + (vertex[2] - cz)**2 < c_width**2:
+                    vertex[1] = vertex[1] - abs((((vertex[0] - cx)**2 + (vertex[2] - cz)**2)**0.5 /c_width) * c_height)
 
     def get_center(self):
         return self.center

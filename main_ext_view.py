@@ -14,6 +14,7 @@ from terrain import *
 from autopilot import *
 from sound import *
 from camera import *
+from gpws import *
 
 def dampen_rotation(ship, dt):
     if not ship.get_ang_vel() == [0,0,0]:
@@ -25,19 +26,24 @@ def dampen_rotation(ship, dt):
 def main():
     
     def init():
+        print("Initializing lander...")
         # init objects
         ship = lander(pywavefront.Wavefront("data/models/lunar_lander.obj", collect_faces=True),
                       [5000, 1000, 0], [-175, -12.5, 0],
                       [[1,0,0], [0,1,0], [0,0,1]],
                       [0,0,0],
-                      5000, 3000,
+                      5000, 4000,
                       [10, 10, 10],
-                      100000, 550000, 100000,
+                      100000, 250000, 45000,
                       True, 35, -5)
 
-        landing_zone = terrain([0,0,0], [20000, 15, 4000], 0.0075)
+        landing_zone = terrain([0,0,0], [20000, 250, 4000], 0.0075)
         landing_zone.generate()
 
+        wide_field = terrain([0,-15,0], [100000, 1, 100000], 0.00005)
+        wide_field.generate()
+
+        print("Initializing autopilot...")
         autothrottle = autopilot("AP_autothrottle", ship, False, landing_zone)
         at_descent_rate = -5
 
@@ -46,6 +52,7 @@ def main():
                            [0,1,0],
                            [0,0,1]])
 
+        print("Initializing graphics...")
         # init graphics
         glfw.init()
 
@@ -61,12 +68,13 @@ def main():
         delta_t = 0.1
         sim_time = 0
 
+        print("Initializing sound...")
         # init sound
         init_sound()
 
-        return ship, landing_zone, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time
+        return ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time
 
-    ship, landing_zone, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time = init()
+    ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time = init()
 
     main_cam.set_pos([-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50])
     main_cam.rotate([-30, 0, 0])
@@ -159,9 +167,12 @@ def main():
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()
+        drawTerrain(wide_field, ship, 50)
         drawTerrain(landing_zone, ship, 2)
         drawVessel(ship)
         drawInterface(main_cam, ship, autopilot_active)
+
+        gpws(ship, landing_zone, delta_t)
         
         glfw.swap_buffers(window)
 
