@@ -4,6 +4,13 @@ of its landing burn. You will have to cancel your velocity
 and make a soft touchdown before you run out of propellant
 (or overshoot the landing zone :)).
 
+Required Python packages:
+
+ - pyopengl
+ - pygame
+ - pywavefront
+ - keyboard
+
 How To Run:
 
 a) Running main_ext_view.py starts the game in external 
