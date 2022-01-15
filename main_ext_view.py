@@ -37,7 +37,7 @@ def main():
                       100000, 250000, 45000,
                       True, 35, -5)
 
-        landing_zone = terrain([0,0,0], [20000, 250, 4000], 0.0075)
+        landing_zone = terrain([0,0,0], [20000, 250, 4000], 0.0125)
         landing_zone.generate()
 
         wide_field = terrain([0,-15,0], [100000, 1, 100000], 0.00005)
@@ -60,7 +60,7 @@ def main():
         glfw.set_window_pos(window,200,200)
         glfw.make_context_current(window)
         
-        gluPerspective(70, 800/600, 0.005, 50000.0)
+        gluPerspective(70, 800/600, 0.05, 25000.0)
         glEnable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT, GL_FILL)
         

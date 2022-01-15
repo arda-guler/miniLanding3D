@@ -66,7 +66,10 @@ class terrain():
 
             for vertex in self.vertices:
                 if (vertex[0] - cx)**2 + (vertex[2] - cz)**2 < c_width**2:
-                    vertex[1] = vertex[1] - abs((((vertex[0] - cx)**2 + (vertex[2] - cz)**2)**0.5 /c_width) * c_height)
+                    # vertex[1] = vertex[1] - abs((((vertex[0] - cx)**2 + (vertex[2] - cz)**2)**0.5 /c_width) * c_height)
+                    vertex[1] = -c_height + random.uniform(-c_height/25, c_height/25)
+                elif c_width**2 < (vertex[0] - cx)**2 + (vertex[2] - cz)**2 < c_width**2 * 1.3:
+                    vertex[1] = vertex[1] + abs((((vertex[0] - cx)**2 + (vertex[2] - cz)**2)**0.5 /c_width) * c_height/5)
 
     def get_center(self):
         return self.center
