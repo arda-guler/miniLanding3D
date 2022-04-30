@@ -82,7 +82,7 @@ def main():
     #glTranslate(-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50)
 
     cycle_num = 0
-    while True:
+    while not glfw.window_should_close(window):
         cycle_start = time.perf_counter()
         sim_time += delta_t
         cycle_num += 1

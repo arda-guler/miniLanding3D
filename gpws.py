@@ -1,10 +1,11 @@
 from sound import *
 
 prev_engine = None
+prev_fuel = None
 
 def gpws(ship, terrain, delta_t):
 
-    global prev_engine
+    global prev_engine, prev_fuel
 
     if get_channel_busy(5):
         return
@@ -26,6 +27,9 @@ def gpws(ship, terrain, delta_t):
     elif prev_engine and not ship.get_main_engine() and alt > 15:
         play_gpws("stall")
 
+    elif prev_fuel and prev_fuel > 500 and ship.get_prop_mass() < 500:
+        play_gpws("fuellow")
+
     elif horiz_speed > 15 and alt < 150:
         if sink_rate > 1:
             play_gpws("dontsink")
@@ -40,7 +44,7 @@ def gpws(ship, terrain, delta_t):
         elif ship.get_orient()[1][1] < 0.5:
             play_gpws("bankangle")
         
-    elif alt >= 300:
+    elif ship.get_pos()[1] >= 300:
         if sink_rate < 3 and horiz_speed < 200:
             if 0 < sink_rate < 3:
                 play_gpws("increasedescent")
@@ -52,6 +56,7 @@ def gpws(ship, terrain, delta_t):
                 play_gpws("bankangle")
 
     prev_engine = ship.get_main_engine()
+    prev_fuel = ship.get_prop_mass()
         
 
         

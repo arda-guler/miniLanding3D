@@ -81,7 +81,7 @@ def main():
     main_cam.rotate([-35,0,0])
 
     cycle_num = 0
-    while True:
+    while not glfw.window_should_close(window):
         cycle_start = time.perf_counter()
         sim_time += delta_t
         cycle_num += 1

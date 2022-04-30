@@ -70,9 +70,10 @@ def drawTerrain(t, current_ship, render_dist):
     glEnd()
 
     glColor(0.0, 0.5, 0.0)
-    glBegin(GL_LINES)
+    
     # draw x lines
     for a in range(t.z_lines_num):
+        glBegin(GL_LINE_STRIP)
         for b in range(t.x_lines_num):
             # why the hell is drawing lines so bloody expensive??
             # anyway, don't draw those that are too far away
@@ -86,7 +87,7 @@ def drawTerrain(t, current_ship, render_dist):
                     glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
                     glVertex3f(t.vertices[(a+1)*t.x_lines_num+b][0], t.vertices[(a+1)*t.x_lines_num+b][1], t.vertices[(a+1)*t.x_lines_num+b][2])
 
-    glEnd()
+        glEnd()
     
     glPopMatrix()
 
