@@ -175,6 +175,7 @@ def main():
             break
 
         gpws(ship, landing_zone, delta_t)
+        alt_readout(ship, landing_zone)
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()

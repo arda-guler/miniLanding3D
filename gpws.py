@@ -3,6 +3,36 @@ from sound import *
 prev_engine = None
 prev_fuel = None
 
+readout_alts = [10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2500]
+readout_list = [False] * len(readout_alts)
+
+def alt_readout(ship, terrain):
+
+    global readout_list, readout_alts
+
+    def play_alt_readout(snd_name):
+        play_sfx("altitude/" + snd_name, 0, 6)
+
+    alt = ship.get_alt_quick(terrain)
+
+    #print(readout_list)
+
+    snd_name = None
+    for read_alt_index in range(len(readout_alts)):
+        read_alt = readout_alts[read_alt_index]
+        if read_alt * 0.6 < alt < read_alt and not readout_list[read_alt_index]:
+            snd_name = str(read_alt)
+            readout_list[read_alt_index] = True
+            break
+
+    if snd_name:
+        play_alt_readout(snd_name)
+
+    for read_alt_index in range(len(readout_alts)):
+        read_alt = readout_alts[read_alt_index]
+        if alt > read_alt * 1.5 and readout_list[read_alt_index]:
+            readout_list[read_alt_index] = False
+
 def gpws(ship, terrain, delta_t):
 
     global prev_engine, prev_fuel

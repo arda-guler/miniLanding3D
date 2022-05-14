@@ -173,6 +173,7 @@ def main():
         drawInterface(main_cam, ship, autopilot_active)
 
         gpws(ship, landing_zone, delta_t)
+        alt_readout(ship, landing_zone)
         
         glfw.swap_buffers(window)
 
