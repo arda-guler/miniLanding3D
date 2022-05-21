@@ -81,11 +81,11 @@ def drawTerrain(t, current_ship, render_dist):
                 abs(current_ship.get_pos()[2] - t.vertices[a*t.x_lines_num+b][2]) < 100 * render_dist + current_ship.get_pos()[1] * 0.625 * render_dist):
                 if not b+1 == t.x_lines_num:
                     glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
-                    glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
+                    #glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
 
-                if not a+1 == t.z_lines_num:
+                if not a-1 < 0:
+                    glVertex3f(t.vertices[(a-1)*t.x_lines_num+b][0], t.vertices[(a-1)*t.x_lines_num+b][1], t.vertices[(a-1)*t.x_lines_num+b][2])
                     glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
-                    glVertex3f(t.vertices[(a+1)*t.x_lines_num+b][0], t.vertices[(a+1)*t.x_lines_num+b][1], t.vertices[(a+1)*t.x_lines_num+b][2])
 
         glEnd()
     

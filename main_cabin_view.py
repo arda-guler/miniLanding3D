@@ -35,7 +35,7 @@ def main():
                       [0,0,0],
                       5000, 4000,
                       [10, 10, 10],
-                      10000, 250000, 45000,
+                      45000, 250000, 45000,
                       True, 35, -3)
 
         landing_zone = terrain([0,0,0], [4000, 550, 20000], 0.0125)
@@ -157,22 +157,23 @@ def main():
 ##                          -ship.get_pos()[2] + (0.65*ship.get_orient()[0][2]) + (-1.9*ship.get_orient()[1][2]) + (0.9*ship.get_orient()[2][2])])
         
         # touched down?
-        if ship.get_landing_tag_pos()[1] <= landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
-            if vector_mag(ship.get_vel()) <= 10 and ship.get_vel()[1] > -3:
-                print("Touchdown!")
-                play_sfx("land", 0, 3)
-                if ship.get_main_engine():
-                    ship.toggle_main_engine()
-                    stop_channel(0)
-                time.sleep(5)
-            else:
-                print("Crash!")
-                play_sfx("crash", 0, 3)
-                if ship.get_main_engine():
-                    ship.toggle_main_engine()
-                    stop_channel(0)
-                time.sleep(5)
-            break
+        if ship.get_landing_tag_pos()[1] - 50 <= landing_zone.estimate_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
+            if ship.get_landing_tag_pos()[1] <= landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
+                if vector_mag(ship.get_vel()) <= 10 and ship.get_vel()[1] > -3:
+                    print("Touchdown!")
+                    play_sfx("land", 0, 3)
+                    if ship.get_main_engine():
+                        ship.toggle_main_engine()
+                        stop_channel(0)
+                    time.sleep(5)
+                else:
+                    print("Crash!")
+                    play_sfx("crash", 0, 3)
+                    if ship.get_main_engine():
+                        ship.toggle_main_engine()
+                        stop_channel(0)
+                    time.sleep(5)
+                break
 
         gpws(ship, landing_zone, delta_t)
         alt_readout(ship, landing_zone)
@@ -186,22 +187,24 @@ def main():
         
         glfw.swap_buffers(window)
 
-        if cycle_num % 2 == 0:
-            # console output
-            try:
-                system("cls")
-            except:
-                system("clear")
+        # console output
+        try:
+            system("cls")
+        except:
+            system("clear")
 
-            print("T: %.1f" % sim_time)
-            print("\nAltitude: %.2f" % ship.get_alt(landing_zone))
-            print("Velocity: %.2f" % vector_mag(ship.get_vel()))
-            print("Descent Rate: %.2f" % ship.get_vel()[1])
-            print("AP Descent Rate Cmd: %.1f" % at_descent_rate)
+        print("T: %.1f" % sim_time)
+        if ship.get_alt_quick(landing_zone) > 50:
+            print("\nAltitude: %.1f" % ship.get_alt_quick(landing_zone))
+        else:
+            print("\nAltitude: %.1f" % ship.get_alt(landing_zone))
+        print("Velocity: %.2f" % vector_mag(ship.get_vel()))
+        print("Descent Rate: %.2f" % ship.get_vel()[1])
+        print("AP Descent Rate Cmd: %.1f" % at_descent_rate)
 
-            #print("\nMain Engine:", ship.get_main_engine_str())
-            #print("Throttle:", ship.get_percent_thrust())
-            print("Propellant: %.0f" % ship.get_prop_mass())
+        #print("\nMain Engine:", ship.get_main_engine_str())
+        #print("Throttle:", ship.get_percent_thrust())
+        print("Propellant: %.0f" % ship.get_prop_mass())
 
         if rot_damp:
             print("\nKILL ROT")

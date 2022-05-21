@@ -76,14 +76,31 @@ class terrain():
 
     def get_closest_vertex_xz(self, xz):
         if self.vertices:
-            result = None
-            last_dist = None
-            for vertex in self.vertices:
-                if not result or ((xz[0] - vertex[0])**2 + (xz[1] - vertex[2])**2)**0.5 < last_dist:
-                    result = vertex
-                    last_dist = ((xz[0] - vertex[0])**2 + (xz[1] - vertex[2])**2)**0.5
 
-            return result
+            z_lines_num = self.z_lines_num
+            x_lines_num = self.x_lines_num
+
+            x_spacing = abs(self.vertices[1][0] - self.vertices[0][0])
+            z_spacing = abs(self.vertices[0][2] - self.vertices[x_lines_num + 1][2])
+
+            rel_x = xz[0] - self.center[0]
+            rel_z = xz[1] - self.center[2]
+
+            z_ind = int(z_lines_num/2 + rel_z / z_spacing)
+            x_ind = int(x_lines_num/2 + rel_x / x_spacing)
+
+            index = z_ind * x_lines_num + x_ind
+
+            return self.vertices[index]
+            
+##            result = None
+##            last_dist = None
+##            for vertex in self.vertices:
+##                if not result or ((xz[0] - vertex[0])**2 + (xz[1] - vertex[2])**2)**0.5 < last_dist:
+##                    result = vertex
+##                    last_dist = ((xz[0] - vertex[0])**2 + (xz[1] - vertex[2])**2)**0.5
+##
+##            return result
         else:
             return -1
             

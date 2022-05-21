@@ -141,21 +141,22 @@ def main():
         #glTranslate(-ship.get_vel()[0] * delta_t, -ship.get_vel()[1] * delta_t, -ship.get_vel()[2] * delta_t)
 
         # touched down?
-        if ship.get_landing_tag_pos()[1] <= landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
-            if vector_mag(ship.get_vel()) <= 10:
-                print("Touchdown!")
-                play_sfx("land", 0, 3)
-                if ship.get_main_engine():
-                    ship.toggle_main_engine()
-                    stop_channel(0)
-            else:
-                print("Crash!")
-                play_sfx("crash", 0, 3)
-                if ship.get_main_engine():
-                    ship.toggle_main_engine()
-                    stop_channel(0)
-            time.sleep(5)
-            break
+        if ship.get_landing_tag_pos()[1] - 50 <= landing_zone.estimate_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
+            if ship.get_landing_tag_pos()[1] <= landing_zone.get_height_at_pos([ship.get_pos()[0], ship.get_pos()[2]]):
+                if vector_mag(ship.get_vel()) <= 10:
+                    print("Touchdown!")
+                    play_sfx("land", 0, 3)
+                    if ship.get_main_engine():
+                        ship.toggle_main_engine()
+                        stop_channel(0)
+                else:
+                    print("Crash!")
+                    play_sfx("crash", 0, 3)
+                    if ship.get_main_engine():
+                        ship.toggle_main_engine()
+                        stop_channel(0)
+                time.sleep(5)
+                break
 
         if ship.get_main_engine() and not get_channel_busy(0):
             play_sfx("main_engine", -1, 0)
@@ -184,7 +185,10 @@ def main():
             system("clear")
 
         print("T: %.2f" % sim_time)
-        print("\nAltitude: %.1f" % ship.get_alt(landing_zone))
+        if ship.get_alt_quick(landing_zone) > 50:
+            print("\nAltitude: %.1f" % ship.get_alt_quick(landing_zone))
+        else:
+            print("\nAltitude: %.1f" % ship.get_alt(landing_zone))
         print("Velocity: %.2f" % vector_mag(ship.get_vel()))
         print("Descent Rate: %.2f" % ship.get_vel()[1])
         print("AP Descent Rate Cmd: %.1f" % at_descent_rate)
