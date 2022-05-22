@@ -71,6 +71,9 @@ class terrain():
                 elif c_width**2 < (vertex[0] - cx)**2 + (vertex[2] - cz)**2 < c_width**2 * 1.3:
                     vertex[1] = vertex[1] + abs((((vertex[0] - cx)**2 + (vertex[2] - cz)**2)**0.5 /c_width) * c_height/5)
 
+        self.x_spacing = abs(self.vertices[1][0] - self.vertices[0][0])
+        self.z_spacing = abs(self.vertices[0][2] - self.vertices[x_lines_num + 1][2])
+
     def get_center(self):
         return self.center
 
@@ -80,8 +83,8 @@ class terrain():
             z_lines_num = self.z_lines_num
             x_lines_num = self.x_lines_num
 
-            x_spacing = abs(self.vertices[1][0] - self.vertices[0][0])
-            z_spacing = abs(self.vertices[0][2] - self.vertices[x_lines_num + 1][2])
+            x_spacing = self.x_spacing
+            z_spacing = self.z_spacing
 
             rel_x = xz[0] - self.center[0]
             rel_z = xz[1] - self.center[2]

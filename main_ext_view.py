@@ -34,7 +34,7 @@ def main():
                       [0,0,0],
                       5000, 4000,
                       [10, 10, 10],
-                      100000, 250000, 45000,
+                      10000, 25000, 4500,
                       True, 35, -5)
 
         landing_zone = terrain([0,0,0], [20000, 250, 4000], 0.0125)
@@ -65,7 +65,7 @@ def main():
         glPolygonMode(GL_FRONT, GL_FILL)
         
         # init variables
-        delta_t = 0.1
+        delta_t = 0.05
         sim_time = 0
 
         print("Initializing sound...")
@@ -206,5 +206,7 @@ def main():
         cycle_dt = time.perf_counter() - cycle_start
         if cycle_dt < delta_t:
             time.sleep(delta_t - cycle_dt)
+
+        delta_t = cycle_dt
 
 main()

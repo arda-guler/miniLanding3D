@@ -13,7 +13,10 @@ def alt_readout(ship, terrain):
     def play_alt_readout(snd_name):
         play_sfx("altitude/" + snd_name, 0, 6)
 
-    alt = ship.get_alt_quick(terrain)
+    if ship.get_alt_quick(terrain) > 50:
+        alt = ship.get_alt_quick(terrain)
+    else:
+        alt = ship.get_alt(terrain)
 
     #print(readout_list)
 

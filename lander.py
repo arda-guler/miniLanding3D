@@ -91,10 +91,9 @@ class lander():
         self.accel = [0, -lunar_gravity, 0]
 
         if self.main_engine and self.prop_mass:
-            thrust_dt = self.thrust * dt
-            thrust_dt_vector = vector_scale(self.orient[1], thrust_dt)
-            thrust_dt_accel = vector_scale(thrust_dt_vector, 1/(self.dry_mass + self.prop_mass))
-            self.accel = vector_add(self.accel, thrust_dt_accel)
+            thrust_vector = vector_scale(self.orient[1], self.thrust)
+            thrust_accel = vector_scale(thrust_vector, 1/(self.dry_mass + self.prop_mass))
+            self.accel = vector_add(self.accel, thrust_accel)
 
         elif not self.prop_mass and self.main_engine:
             self.toggle_main_engine()

@@ -35,10 +35,10 @@ def main():
                       [0,0,0],
                       5000, 4000,
                       [10, 10, 10],
-                      45000, 250000, 45000,
+                      4500, 25000, 4500,
                       True, 35, -3)
 
-        landing_zone = terrain([0,0,0], [4000, 550, 20000], 0.0125)
+        landing_zone = terrain([0,0,0], [20000, 550, 20000], 0.00625)
         landing_zone.generate()
 
         wide_field = terrain([0,-15,0], [100000, 1, 100000], 0.00005)
@@ -181,7 +181,7 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()
         drawTerrain(wide_field, ship, 50)
-        drawTerrain(landing_zone, ship, 2)
+        drawTerrain(landing_zone, ship, 5)
         drawVessel(ship)
         drawInterface(main_cam, ship, autopilot_active)
         
@@ -215,5 +215,7 @@ def main():
         cycle_dt = time.perf_counter() - cycle_start
         if cycle_dt < delta_t:
             time.sleep(delta_t - cycle_dt)
+
+        delta_t = cycle_dt
 
 main()

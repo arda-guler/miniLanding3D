@@ -52,40 +52,90 @@ def drawTerrain(t, current_ship, render_dist):
 
     glBegin(GL_POLYGON)
 
-    # draw x lines
-    for a in range(t.z_lines_num):
-        for b in range(t.x_lines_num):
-            # why the hell is drawing lines so bloody expensive??
-            # anyway, don't draw those that are too far away
-            if (abs(current_ship.get_pos()[0] - t.vertices[a*t.x_lines_num+b][0]) < 250*render_dist + current_ship.get_pos()[1] * render_dist and
-                abs(current_ship.get_pos()[2] - t.vertices[a*t.x_lines_num+b][2]) < 250*render_dist + current_ship.get_pos()[1] * render_dist):
-                if not b+1 == t.x_lines_num:
-                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
-                    glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
+    x_lines_num = t.x_lines_num
+    z_lines_num = t.z_lines_num
+    x_spacing = t.x_spacing
+    z_spacing = t.z_spacing
 
-                if not a+1 == t.z_lines_num:
-                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
-                    glVertex3f(t.vertices[(a+1)*t.x_lines_num+b][0], t.vertices[(a+1)*t.x_lines_num+b][1], t.vertices[(a+1)*t.x_lines_num+b][2])
+    rect_render_dist = 250*render_dist + current_ship.get_pos()[1] * render_dist
+
+    rel_x = current_ship.get_pos()[0] - t.center[0]
+    rel_z = current_ship.get_pos()[2] - t.center[2]
+
+    render_min_x = rel_x - rect_render_dist
+    render_max_x = rel_x + rect_render_dist
+    x_min_index = max(int(x_lines_num/2 + render_min_x/x_spacing), 0)
+    x_max_index = max(int(x_lines_num/2 + render_max_x/x_spacing), x_lines_num-1)
+
+    render_min_z = rel_z - rect_render_dist
+    render_max_z = rel_z + rect_render_dist
+    z_min_index = max(int(z_lines_num/2 + render_min_z/z_spacing), 0)
+    z_max_index = max(int(z_lines_num/2 + render_max_z/z_spacing), z_lines_num-1)
+
+    #print(x_min_index, x_max_index)
+    #print(z_min_index, z_max_index)
+    
+    indices = []
+    ai = 0
+    for a in range(z_min_index, z_max_index):
+        indices.append([])
+        for b in range(x_min_index, x_max_index):
+            indices[ai].append(a * x_lines_num + b)
+
+        ai += 1
+
+    for z in indices:
+        for x in z:
+            #print(x)
+            try:
+                glVertex3f(t.vertices[x][0], t.vertices[x][1], t.vertices[x][2])
+                glVertex3f(t.vertices[x+x_lines_num][0], t.vertices[x+x_lines_num][1], t.vertices[x+x_lines_num][2])
+            except:
+                pass
+        
+    
+##    for a in range(t.z_lines_num):
+##        for b in range(t.x_lines_num):
+##            # why the hell is drawing lines so bloody expensive??
+##            # anyway, don't draw those that are too far away
+##            if (abs(current_ship.get_pos()[0] - t.vertices[a*t.x_lines_num+b][0]) < 250*render_dist + current_ship.get_pos()[1] * render_dist and
+##                abs(current_ship.get_pos()[2] - t.vertices[a*t.x_lines_num+b][2]) < 250*render_dist + current_ship.get_pos()[1] * render_dist):
+##                if not b+1 == t.x_lines_num:
+##                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
+##                    #glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
+##
+##                if not a-1 < 0:
+##                    glVertex3f(t.vertices[(a-1)*t.x_lines_num+b][0], t.vertices[(a-1)*t.x_lines_num+b][1], t.vertices[(a-1)*t.x_lines_num+b][2])
+##                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
 
     glEnd()
 
     glColor(0.0, 0.5, 0.0)
-    
-    # draw x lines
-    for a in range(t.z_lines_num):
-        glBegin(GL_LINE_STRIP)
-        for b in range(t.x_lines_num):
-            # why the hell is drawing lines so bloody expensive??
-            # anyway, don't draw those that are too far away
-            if (abs(current_ship.get_pos()[0] - t.vertices[a*t.x_lines_num+b][0]) < 100 * render_dist + current_ship.get_pos()[1] * 0.625 * render_dist and
-                abs(current_ship.get_pos()[2] - t.vertices[a*t.x_lines_num+b][2]) < 100 * render_dist + current_ship.get_pos()[1] * 0.625 * render_dist):
-                if not b+1 == t.x_lines_num:
-                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
-                    #glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
 
-                if not a-1 < 0:
-                    glVertex3f(t.vertices[(a-1)*t.x_lines_num+b][0], t.vertices[(a-1)*t.x_lines_num+b][1], t.vertices[(a-1)*t.x_lines_num+b][2])
-                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
+    for z in indices:
+        glBegin(GL_LINE_STRIP)
+        for x in z:
+            #print(x)
+            try:
+                glVertex3f(t.vertices[x][0], t.vertices[x][1], t.vertices[x][2])
+                glVertex3f(t.vertices[x+x_lines_num+1][0], t.vertices[x+x_lines_num+1][1], t.vertices[x+x_lines_num+1][2])
+            except:
+                pass
+    
+##    for a in range(t.z_lines_num):
+##        glBegin(GL_LINE_STRIP)
+##        for b in range(t.x_lines_num):
+##            # why the hell is drawing lines so bloody expensive??
+##            # anyway, don't draw those that are too far away
+##            if (abs(current_ship.get_pos()[0] - t.vertices[a*t.x_lines_num+b][0]) < 100 * render_dist + current_ship.get_pos()[1] * 0.625 * render_dist and
+##                abs(current_ship.get_pos()[2] - t.vertices[a*t.x_lines_num+b][2]) < 100 * render_dist + current_ship.get_pos()[1] * 0.625 * render_dist):
+##                if not b+1 == t.x_lines_num:
+##                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
+##                    #glVertex3f(t.vertices[a*t.x_lines_num+b+1][0], t.vertices[a*t.x_lines_num+b+1][1], t.vertices[a*t.x_lines_num+b+1][2])
+##
+##                if not a-1 < 0:
+##                    glVertex3f(t.vertices[(a-1)*t.x_lines_num+b][0], t.vertices[(a-1)*t.x_lines_num+b][1], t.vertices[(a-1)*t.x_lines_num+b][2])
+##                    glVertex3f(t.vertices[a*t.x_lines_num+b][0], t.vertices[a*t.x_lines_num+b][1], t.vertices[a*t.x_lines_num+b][2])
 
         glEnd()
     
