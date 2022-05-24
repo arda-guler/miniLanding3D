@@ -43,3 +43,5 @@ b) Running main_cabin_view.py starts the game in commander's
    engine
    
 -  Hold the X key to kill all rotation (panic button)
+
+-  M key toggles music.

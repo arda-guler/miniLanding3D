@@ -52,6 +52,10 @@ def main():
                            [0,1,0],
                            [0,0,1]])
 
+        print("Initializing sound...")
+        # init sound
+        init_sound()
+
         print("Initializing graphics...")
         # init graphics
         glfw.init()
@@ -68,10 +72,6 @@ def main():
         delta_t = 0.05
         sim_time = 0
 
-        print("Initializing sound...")
-        # init sound
-        init_sound()
-
         return ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time
 
     ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time = init()
@@ -81,6 +81,10 @@ def main():
     #glRotate(30, 1, 0, 0)
     #glTranslate(-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50)
 
+    music_on = True
+
+    play_bgm("paradise_1")
+    current_bgm = "paradise_1"
     cycle_num = 0
     while not glfw.window_should_close(window):
         cycle_start = time.perf_counter()
@@ -134,6 +138,13 @@ def main():
                 ship.update_ang_vel(attitude_thrust, delta_t)
                 play_sfx("rcs", 0, 1)
 
+        # bgm toggle
+        if keyboard.is_pressed("m"):
+            music_on = not music_on
+
+        if is_music_playing() and not music_on:
+            stop_channel(7)
+
         ship.update_physics(delta_t)
 
         # have the camera follow the ship
@@ -146,16 +157,25 @@ def main():
                 if vector_mag(ship.get_vel()) <= 10:
                     print("Touchdown!")
                     play_sfx("land", 0, 3)
+                    if music_on:
+                        play_bgm("paradise_2")
                     if ship.get_main_engine():
                         ship.toggle_main_engine()
                         stop_channel(0)
+                    while not glfw.window_should_close(window):
+                        glfw.poll_events()
+                    quit()
                 else:
                     print("Crash!")
                     play_sfx("crash", 0, 3)
+                    if music_on and not current_bgm == "babayaga":
+                        play_bgm("babayaga")
                     if ship.get_main_engine():
                         ship.toggle_main_engine()
                         stop_channel(0)
-                time.sleep(5)
+                    while not glfw.window_should_close(window):
+                        glfw.poll_events()
+                    quit()
                 break
 
         if ship.get_main_engine() and not get_channel_busy(0):
@@ -164,7 +184,18 @@ def main():
         elif not ship.get_main_engine() and get_channel_busy(0):
             stop_channel(0)
 
-        set_channel_volume(0, ship.get_percent_thrust()/100)
+        set_channel_volume(0, (ship.get_percent_thrust()/100)*0.6)
+
+        # music
+        if music_on:
+            if not (ship.get_prop_mass() < 500 and ship.get_alt_quick(landing_zone) > 100) or not (ship.get_prop_mass() <= 0):
+                if not is_music_playing():
+                    play_bgm("bluedan")
+                    current_bgm = "bluedan"
+            else:
+                if not is_music_playing() or not current_bgm == "babayaga":
+                    play_bgm("babayaga")
+                    current_bgm = "babayaga"
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()
