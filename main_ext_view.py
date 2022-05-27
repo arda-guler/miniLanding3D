@@ -17,11 +17,22 @@ from camera import *
 from gpws import *
 
 def dampen_rotation(ship, dt):
-    if not ship.get_ang_vel() == [0,0,0]:
-        ship.update_ang_vel([-sign(ship.get_ang_vel()[0]),
-                             -sign(ship.get_ang_vel()[1]),
-                             -sign(ship.get_ang_vel()[2])],
-                            dt)
+    correct_x = 0
+    correct_y = 0
+    correct_z = 0
+    
+    if not abs(ship.get_ang_vel()[0]) < dt * ship.torque[0]:
+        correct_x = -sign(ship.get_ang_vel()[0])
+
+    if not abs(ship.get_ang_vel()[1]) < dt * ship.torque[1]:
+        correct_y = -sign(ship.get_ang_vel()[1])
+
+    if not abs(ship.get_ang_vel()[2]) < dt * ship.torque[2]:
+        correct_z = -sign(ship.get_ang_vel()[2])
+
+    if correct_x or correct_y or correct_z:
+        ship.update_ang_vel([correct_x, correct_y, correct_z], dt)
+        play_sfx("rcs", 0, 1)
 
 def main():
     
@@ -59,12 +70,13 @@ def main():
         print("Initializing graphics...")
         # init graphics
         glfw.init()
+        background_stars = initBackground(250)
 
-        window = glfw.create_window(800,600,"miniLanding3D", None, None)
+        window = glfw.create_window(1000,600,"miniLanding3D", None, None)
         glfw.set_window_pos(window,200,200)
         glfw.make_context_current(window)
         
-        gluPerspective(70, 800/600, 0.05, 25000.0)
+        gluPerspective(70, 1000/600, 0.05, 25000.0)
         glEnable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT, GL_FILL)
         
@@ -72,9 +84,9 @@ def main():
         delta_t = 0.05
         sim_time = 0
 
-        return ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time
+        return ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time, background_stars
 
-    ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time = init()
+    ship, landing_zone, wide_field, autothrottle, at_descent_rate, window, main_cam, delta_t, sim_time, background_stars = init()
 
     main_cam.set_pos([-ship.get_pos()[0], -ship.get_pos()[1] - 5, -ship.get_pos()[2]-50])
     main_cam.rotate([-30, 0, 0])
@@ -116,8 +128,9 @@ def main():
         if (keyboard.is_pressed("u") - keyboard.is_pressed("j")):
             ship.update_thrust((keyboard.is_pressed("u") - keyboard.is_pressed("j")) * ship.get_max_thrust(), delta_t)
 
-        if cycle_num % 2 == 0 and autothrottle.make_decisions([at_descent_rate])[1]:
-            ship.update_thrust(autothrottle.make_decisions([at_descent_rate])[1], delta_t)
+        thrust_update_cmd = autothrottle.make_decisions([at_descent_rate])[1]
+        if cycle_num % 2 == 0 and thrust_update_cmd:
+            ship.update_thrust(thrust_update_cmd, delta_t)
             autopilot_active = True
 
         # attitude control
@@ -199,10 +212,11 @@ def main():
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()
+        drawBackground(background_stars)
         drawTerrain(wide_field, ship, 50)
         drawTerrain(landing_zone, ship, 2)
         drawVessel(ship)
-        drawInterface(main_cam, ship, autopilot_active)
+        drawInterface(main_cam, ship, autopilot_active, landing_zone, at_descent_rate, thrust_update_cmd, rot_damp)
 
         gpws(ship, landing_zone, delta_t)
         alt_readout(ship, landing_zone)
@@ -215,24 +229,24 @@ def main():
         except:
             system("clear")
 
-        print("T: %.2f" % sim_time)
-        if ship.get_alt_quick(landing_zone) > 50:
-            print("\nAltitude: %.1f" % ship.get_alt_quick(landing_zone))
-        else:
-            print("\nAltitude: %.1f" % ship.get_alt(landing_zone))
-        print("Velocity: %.2f" % vector_mag(ship.get_vel()))
-        print("Descent Rate: %.2f" % ship.get_vel()[1])
-        print("AP Descent Rate Cmd: %.1f" % at_descent_rate)
-
-        print("\nMain Engine:", ship.get_main_engine_str())
-        print("Throttle: %.2f" % ship.get_percent_thrust())
-        print("Propellant: %.2f" % ship.get_prop_mass())
-
-        if rot_damp:
-            print("\nKILL ROT")
-
-        if autopilot_active:
-            print("\nATPL ACTV")
+##        print("T: %.2f" % sim_time)
+##        if ship.get_alt_quick(landing_zone) > 50:
+##            print("\nAltitude: %.1f" % ship.get_alt_quick(landing_zone))
+##        else:
+##            print("\nAltitude: %.1f" % ship.get_alt(landing_zone))
+##        print("Velocity: %.2f" % vector_mag(ship.get_vel()))
+##        print("Descent Rate: %.2f" % ship.get_vel()[1])
+##        print("AP Descent Rate Cmd: %.1f" % at_descent_rate)
+##
+##        print("\nMain Engine:", ship.get_main_engine_str())
+##        print("Throttle: %.2f" % ship.get_percent_thrust())
+##        print("Propellant: %.2f" % ship.get_prop_mass())
+##
+##        if rot_damp:
+##            print("\nKILL ROT")
+##
+##        if autopilot_active:
+##            print("\nATPL ACTV")
 
         cycle_dt = time.perf_counter() - cycle_start
         if cycle_dt < delta_t:

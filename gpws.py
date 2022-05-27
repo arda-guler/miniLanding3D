@@ -63,7 +63,7 @@ def gpws(ship, terrain, delta_t):
     elif prev_fuel and prev_fuel > 500 and ship.get_prop_mass() < 500:
         play_gpws("fuellow")
 
-    elif horiz_speed > 15 and alt < 150:
+    elif horiz_speed > 25 and alt < 150:
         if sink_rate > 1:
             play_gpws("dontsink")
         elif sink_rate <= 1:
