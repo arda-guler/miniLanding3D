@@ -1,13 +1,11 @@
 # MiniLanding3D
 
-https://user-images.githubusercontent.com/80536083/168419329-87246b8f-4af6-4af0-9dde-80466a255b51.mp4
-
+https://user-images.githubusercontent.com/80536083/170735416-5b4d14fe-9232-4f9e-93f2-0aa8291cfb91.mp4
 
 miniLanding3D is a spaceflight simulation game in which
 you take control of a lunar lander at the final phases
 of its landing burn. You will have to cancel your velocity
-and make a soft touchdown before you run out of propellant
-(or overshoot the landing zone :)).
+and make a soft touchdown before you run out of propellant.
 
 ## Required Python Modules
 
@@ -23,6 +21,9 @@ a) Running main_ext_view.py starts the game in external
    
 b) Running main_cabin_view.py starts the game in commander's
    POV, looking out of the lander's window
+   
+## Reading the UI
+![UI](https://user-images.githubusercontent.com/80536083/170736673-5b20bba4-e607-47be-8aef-c643fda19a1f.jpg)
 
 ## Controls
 
