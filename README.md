@@ -1,6 +1,8 @@
 # MiniLanding3D
 
-https://user-images.githubusercontent.com/80536083/170735416-5b4d14fe-9232-4f9e-93f2-0aa8291cfb91.mp4
+![ss2](https://user-images.githubusercontent.com/80536083/178206863-ddb0a249-2058-405b-9c69-7803f6b7d4e4.PNG)
+![ss1](https://user-images.githubusercontent.com/80536083/178206882-6c13291c-bcac-4ce0-9886-283369e2ebe7.PNG)
+
 
 miniLanding3D is a spaceflight simulation game in which
 you take control of a lunar lander at the final phases
@@ -21,9 +23,6 @@ a) Running main_ext_view.py starts the game in external
    
 b) Running main_cabin_view.py starts the game in commander's
    POV, looking out of the lander's window
-   
-## Reading the UI
-![UI](https://user-images.githubusercontent.com/80536083/170736673-5b20bba4-e607-47be-8aef-c643fda19a1f.jpg)
 
 ## Controls
 
