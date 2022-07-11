@@ -115,9 +115,15 @@ def main():
             play_sfx("AP_off", 0, 2)
             
         if keyboard.is_pressed("y"):
-            at_descent_rate += 0.5
+            if abs(at_descent_rate) > 0.91:
+                at_descent_rate += 0.5
+            else:
+                at_descent_rate += 0.1
         elif keyboard.is_pressed("h"):
-            at_descent_rate -= 0.5
+            if abs(at_descent_rate) > 0.91:
+                at_descent_rate -= 0.5
+            else:
+                at_descent_rate -= 0.1
 
         # engine ignition
         if ((keyboard.is_pressed("r") and not ship.get_main_engine()) or

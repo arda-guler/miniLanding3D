@@ -225,28 +225,28 @@ def drawRectangle2D(x1, y1, x2, y2, color, camera):
 def drawNumbers(camera, ship, autopilot, terrain, at_descent_rate):
 
     # Velocity
-    vel_x = str(round(ship.get_vel()[0], 3))
-    vel_y = str(round(ship.get_vel()[1], 3))
-    vel_z = str(round(ship.get_vel()[2], 3))
+    vel_x = "VX " + str(round(ship.get_vel()[0], 3))
+    vel_y = "VY " + str(round(ship.get_vel()[1], 3))
+    vel_z = "VZ " + str(round(ship.get_vel()[2], 3))
     
-    render_numbers(vel_x, (0,1,1), (4.45, 3.2), camera, font_size=0.2)
-    render_numbers(vel_y, (0,1,1), (4.45, 2.7), camera, font_size=0.2)
-    render_numbers(vel_z, (0,1,1), (4.45, 2.2), camera, font_size=0.2)
+    render_AN(vel_x, (0,1,1), (4.45, 3.2), camera, font_size=0.1)
+    render_AN(vel_y, (0,1,1), (4.45, 2.7), camera, font_size=0.1)
+    render_AN(vel_z, (0,1,1), (4.45, 2.2), camera, font_size=0.1)
 
     # Altitude
     if ship.get_alt_quick(terrain) > 50:
-        alt = str(round(ship.get_alt_quick(terrain), 3))
+        alt = "ALT " + str(round(ship.get_alt_quick(terrain), 3))
     else:
-        alt = str(round(ship.get_alt(terrain), 3))
-    render_numbers(alt, (0,1,0), (4.45, 0), camera, font_size=0.2)
+        alt = "ALT " + str(round(ship.get_alt(terrain), 3))
+    render_AN(alt, (0,1,0), (4.45, 0), camera, font_size=0.1)
 
     # AP descent rate cmd
-    adr = str(round(at_descent_rate, 1))
-    render_numbers(adr, (1,0,1), (8, 2.7), camera, font_size=0.2)
+    adr = "APDR " + str(round(at_descent_rate, 1))
+    render_AN(adr, (1,0,1), (8, 2.7), camera, font_size=0.1)
 
     # Propellant
-    prop = str(round(ship.get_prop_mass(), 1))
-    render_numbers(prop, (0.75,0,1), (4.45, -5), camera, font_size=0.2)
+    prop = "PROP " + str(round(ship.get_prop_mass(), 1))
+    render_AN(prop, (0.75,0,1), (4.45, -5.3), camera, font_size=0.1)
 
 def drawInterface(camera, ship, autopilot, terrain, at_descent_rate, thrust_update_cmd, rot_damp):
 
