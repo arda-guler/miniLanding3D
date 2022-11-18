@@ -70,6 +70,52 @@ def drawVessel(v):
                 glVertex3f(vertex_i[0], vertex_i[1], vertex_i[2])
         glEnd()
 
+    # engine plume cone
+    if v.get_main_engine():
+        glPushMatrix()
+        glColor(0.9, 0.7, 0)
+
+        glBegin(GL_LINES)
+        
+        plume_start = [0,-5,0]
+        plume_start = numpy.matmul(numpy.array(plume_start), v.get_orient())
+        
+        plume_end_1 = [0.05*v.get_percent_thrust(), -0.15*v.get_percent_thrust(), 0]
+        plume_end_1 = numpy.matmul(numpy.array(plume_end_1), v.get_orient())
+        glVertex3f(plume_start[0], plume_start[1], plume_start[2])
+        glVertex3f(plume_end_1[0], plume_end_1[1], plume_end_1[2])
+
+        plume_end_2 = [-0.05*v.get_percent_thrust(), -0.15*v.get_percent_thrust(), 0]
+        plume_end_2 = numpy.matmul(numpy.array(plume_end_2), v.get_orient())
+        glVertex3f(plume_start[0], plume_start[1], plume_start[2])
+        glVertex3f(plume_end_2[0], plume_end_2[1], plume_end_2[2])
+
+        plume_end_3 = [0, -0.15*v.get_percent_thrust(), 0.05*v.get_percent_thrust()]
+        plume_end_3 = numpy.matmul(numpy.array(plume_end_3), v.get_orient())
+        glVertex3f(plume_start[0], plume_start[1], plume_start[2])
+        glVertex3f(plume_end_3[0], plume_end_3[1], plume_end_3[2])
+
+        plume_end_4 = [0, -0.15*v.get_percent_thrust(), -0.05*v.get_percent_thrust()]
+        plume_end_4 = numpy.matmul(numpy.array(plume_end_4), v.get_orient())
+        glVertex3f(plume_start[0], plume_start[1], plume_start[2])
+        glVertex3f(plume_end_4[0], plume_end_4[1], plume_end_4[2])
+
+        glVertex3f(plume_end_1[0], plume_end_1[1], plume_end_1[2])
+        glVertex3f(plume_end_3[0], plume_end_3[1], plume_end_3[2])
+
+        glVertex3f(plume_end_3[0], plume_end_3[1], plume_end_3[2])
+        glVertex3f(plume_end_2[0], plume_end_2[1], plume_end_2[2])
+
+        glVertex3f(plume_end_2[0], plume_end_2[1], plume_end_2[2])
+        glVertex3f(plume_end_4[0], plume_end_4[1], plume_end_4[2])
+
+        glVertex3f(plume_end_4[0], plume_end_4[1], plume_end_4[2])
+        glVertex3f(plume_end_1[0], plume_end_1[1], plume_end_1[2])
+        
+        glEnd()
+        
+        glPopMatrix()
+
     # now get out
     glPopMatrix()
 

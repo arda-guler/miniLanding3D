@@ -72,11 +72,11 @@ def main():
         glfw.init()
         background_stars = initBackground(250)
 
-        window = glfw.create_window(1000,600,"miniLanding3D", None, None)
+        window = glfw.create_window(1500,900,"miniLanding3D", None, None)
         glfw.set_window_pos(window,200,200)
         glfw.make_context_current(window)
         
-        gluPerspective(70, 1000/600, 0.05, 25000.0)
+        gluPerspective(70, 1500/900, 0.05, 25000.0)
         glEnable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT, GL_FILL)
         
@@ -219,7 +219,7 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         #drawOrigin()
         drawBackground(background_stars)
-        drawTerrain(wide_field, ship, 50)
+        drawTerrain(wide_field, ship, 100)
         drawTerrain(landing_zone, ship, 2)
         drawVessel(ship)
         drawInterface(main_cam, ship, autopilot_active, landing_zone, at_descent_rate, thrust_update_cmd, rot_damp)

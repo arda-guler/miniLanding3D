@@ -73,11 +73,11 @@ def main():
         glfw.init()
         background_stars = initBackground(250)
 
-        window = glfw.create_window(1000,600,"miniLanding3D", None, None)
+        window = glfw.create_window(1500,900,"miniLanding3D", None, None)
         glfw.set_window_pos(window,200,200)
         glfw.make_context_current(window)
         
-        gluPerspective(70, 1000/600, 0.05, 2500000.0)
+        gluPerspective(70, 1500/900, 0.05, 2500000.0)
         glEnable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT, GL_FILL)
         
